@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ShöpKart — Ecommerce Template</title>
+  <style>
+    :root{
+      --bg:#0b1220;
+      --panel:#ffffff;
+      --ink:#0f172a;
+      --muted:#6b7280;
+      --line:#e5e7eb;
+      --brand:#1d4ed8;
+      --brand2:#22c55e;
+      --shadow: 0 18px 60px rgba(0,0,0,.35);
+      --radius: 14px;
+    }
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      background:
+        radial-gradient(1100px 520px at 50% 15%, rgba(96,165,250,.35), transparent 60%),
+        radial-gradient(900px 420px at 15% 25%, rgba(34,197,94,.18), transparent 60%),
+        linear-gradient(180deg, #0b1220, #0a1226 55%, #0b1220);
+      color:#fff;
+      padding: 42px 16px;
+    }
+
+    .shell{max-width: 1180px; margin: 0 auto;}
+
+    .site{
+      background: var(--panel);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255,255,255,.08);
+    }
+
+    /* Top promo strip (sticky marquee) */
+    .top-strip{
+      background:#111a2e;
+      color:#e5e7eb;
+      font-size:13px;
+      padding:8px 0;
+      position:sticky;
+      top:0;
+      z-index:30;
+      overflow:hidden;
+    }
+    .marquee{
+      display:flex;
+      width:max-content;
+      gap: 28px;
+      align-items:center;
+      animation: marquee 18s linear infinite;
+      padding-left: 16px;
+    }
+    .marquee span{white-space:nowrap}
+    .dot{opacity:.65}
+    @keyframes marquee{ from{transform: translateX(100%)} to{transform: translateX(-100%)} }
+
+    /* Header */
+    .header{
+      background:#fff;
+      color:var(--ink);
+      border-bottom:1px solid var(--line);
+      padding: 14px 18px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 16px;
+      flex-wrap: nowrap; /* keep logo, search, account, cart on one line */
+    }
+
+    .left-group{display:flex;align-items:center;gap:14px;flex-shrink:0}
+
+    .logo{
+      display:flex;
+      align-items:center;
+      gap: 0;
+      font-weight:900;
+      font-size: 28px;
+      letter-spacing: -0.6px;
+      line-height: 1;
+      user-select:none;
+    }
+    .logo .clean{color: var(--brand)}
+    .logo .kart{color: var(--brand2)}
+
+    .nav{display:flex;align-items:center;justify-content:center;flex:1}
+    .nav-search{width: min(520px, 100%);}
+    .nav-search input{
+      width: 100%;
+      padding:10px 44px 10px 42px; /* room for icon + clear */
+      border-radius:12px;
+      border:1px solid var(--line);
+      background:#f8fafc;
+      outline: none;
+      font-size: 14px;
+    }
+
+    .search-field{position:relative; width:100%;}
+    .search-icon{
+      position:absolute;
+      left:12px;
+      top:50%;
+      transform:translateY(-50%);
+      color:#64748b;
+      display:grid;
+      place-items:center;
+      pointer-events:none;
+    }
+    .clear-btn{
+      position:absolute;
+      right:8px;
+      top:50%;
+      transform:translateY(-50%);
+      width:32px;
+      height:32px;
+      border-radius:10px;
+      border:1px solid transparent;
+      background:transparent;
+      color:#64748b;
+      cursor:pointer;
+      display:none;
+    }
+    .clear-btn:hover{border-color:var(--line); background:#eef2ff}
+
+    .sr-only{
+      position:absolute;
+      width:1px;
+      height:1px;
+      padding:0;
+      margin:-1px;
+      overflow:hidden;
+      clip:rect(0,0,0,0);
+      white-space:nowrap;
+      border:0;
+    }
+    .nav-search input:focus{border-color: rgba(29,78,216,.5); box-shadow: 0 0 0 3px rgba(29,78,216,.15)}
+
+    .actions{display:flex;align-items:center;gap:12px;color:#0f172a;flex-shrink:0}
+    .icon-btn{
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display:grid;
+      place-items:center;
+      border: 1px solid transparent;
+      background: transparent;
+      cursor:pointer;
+    }
+    .icon-btn:hover{border-color: var(--line); background:#f8fafc}
+    .icon{width: 20px; height: 20px;}
+
+    /* Hero carousel */
+    .hero{background:#fff; padding: 0; position: relative; overflow: hidden;}
+    .hero-carousel{position: relative; width: 100%; height: 360px;}
+
+    .hero-slide{position: absolute; inset: 0; opacity: 0; transition: opacity .5s ease;}
+    .hero-slide.active{opacity:1}
+
+    .hero-slide img{width:100%; height:100%; object-fit: cover;}
+
+    .hero-arrow{
+      position:absolute;
+      top:50%;
+      transform: translateY(-50%);
+      width:42px;
+      height:42px;
+      border-radius:50%;
+      background: rgba(0,0,0,.45);
+      color:#fff;
+      display:grid;
+      place-items:center;
+      cursor:pointer;
+      z-index:5;
+      user-select:none;
+    }
+    .hero-arrow.left{left:16px}
+    .hero-arrow.right{right:16px}
+
+    .hero-dots{
+      position:absolute;
+      bottom:16px;
+      left:50%;
+      transform:translateX(-50%);
+      display:flex;
+      gap:8px;
+      z-index:6;
+    }
+    .hero-dot{
+      width:10px;
+      height:10px;
+      border-radius:50%;
+      background: rgba(255,255,255,.6);
+      cursor:pointer;
+    }
+    .hero-dot.active{background:#fff}
+
+    /* Main content */
+    .content{
+      background:#fff;
+      color: var(--ink);
+      padding: 26px 22px 34px;
+      border-top: 1px solid var(--line);
+    }
+
+    .content h2{margin: 0 0 6px; font-size: 28px}
+    .content .muted{color: var(--muted); margin: 0 0 18px}
+
+    .products-wrap{
+      max-width:1100px;
+      margin:0 auto;
+      text-align:center;
+      display:flex;
+      flex-direction:column;
+      align-items:center; /* center section across page */
+    }
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 16px;
+      justify-content:center;
+      width:100%;
+      margin:0 auto;
+    }
+
+    .card{
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      overflow:hidden;
+      background:#fff;
+      display:flex;
+      flex-direction:column;
+    }
+    .card img{width:100%; height: 160px; object-fit: cover;}
+    .card .pad{padding: 12px}
+    .card h3{margin: 0 0 6px; font-size: 16px}
+    .price{font-weight: 900}
+
+    .add{
+      margin-top: 10px;
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: none;
+      background: var(--brand2);
+      font-weight: 900;
+      cursor:pointer;
+    }
+    .add:hover{filter: brightness(1.04)}
+
+    /* Strip banner inserted after products */
+    .strip-banner{
+      grid-column: 1 / -1;
+      background: #1f2933; /* dark grey */
+      border-radius: 14px;
+      padding: 16px 18px;
+      font-weight: 900;
+      color:#e5e7eb;
+      display:flex;
+      justify-content: space-between;
+      align-items:center;
+      gap: 12px;
+    }
+    .strip-banner small{font-weight:700; opacity:.85}
+
+    /* CEO + FAQ section */
+    .ceo-section{ background:#e0f2fe; }
+    .ceo-wrap{max-width:900px;margin:0 auto;text-align:center}
+
+    .ceo-letter-grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:24px;
+      margin-top:16px;
+    }
+
+    .values{
+      display:flex;
+      justify-content:space-between;
+      gap:16px;
+      margin:24px 0;
+      flex-wrap: wrap;
+    }
+    .value{flex:1; min-width: 220px; border:1px solid var(--line); border-radius:12px; padding:16px; background: rgba(255,255,255,.55)}
+
+    .faq{margin-top:16px}
+    .faq-item{border-bottom:1px solid var(--line)}
+    .faq-q{width:100%;text-align:left;padding:14px 0;background:none;border:none;font-weight:700;cursor:pointer}
+    .faq-a{display:none;padding-bottom:14px;color:var(--muted)}
+    .faq-item.open .faq-a{display:block}
+
+    @media (max-width: 720px){
+      .ceo-letter-grid{grid-template-columns:1fr}
+    }
+
+    /* Email subscription */
+    .subscribe-section{ background:#1f2933; color:#e5e7eb; text-align:center; }
+    .subscribe-section .muted{color:#cbd5e1}
+    .subscribe-wrap{max-width:600px; margin:0 auto; display:flex; flex-direction:column; align-items:center;}
+    .subscribe-form{display:flex;gap:10px;margin:16px 0; flex-wrap: wrap}
+    .subscribe-form input{flex:1;min-width: 220px; padding:12px 14px;border-radius:10px;border:1px solid #334155;background:#020617;color:#e5e7eb}
+    .subscribe-form input::placeholder{color:#94a3b8}
+    .subscribe-form button{padding:12px 18px;border-radius:10px;border:none;background:var(--brand);color:#fff;font-weight:800;cursor:pointer}
+    .subscribe-form button:hover{filter:brightness(1.05)}
+
+    /* WhatsApp contact */
+    .contact-section{ background:#f3f4f6; }
+    .contact-grid{
+      max-width:900px;
+      margin:0 auto;
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:24px;
+      align-items:center;
+    }
+    .contact-col h2{margin-top:0}
+    .whatsapp-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      margin-top:12px;
+      padding:14px 18px;
+      border-radius:12px;
+      background:#25D366;
+      color:#052e16;
+      font-weight:900;
+      text-decoration:none;
+    }
+    .whatsapp-btn:hover{filter:brightness(1.05)}
+
+    @media (max-width: 720px){
+      .contact-grid{grid-template-columns:1fr; text-align:center}
+    }
+
+    @media (max-width: 980px){
+      body{padding: 18px 10px;}
+      .header{flex-direction: column; align-items: stretch; gap: 12px;}
+      .left-group, .actions{min-width: auto; justify-content: space-between;}
+      .actions{justify-content:flex-start}
+      .hero-carousel{height: 260px;}
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="site">
+      <div class="top-strip">
+        <div class="marquee">
+          <span>🔥 Free delivery within Nairobi</span>
+          <span class="dot">•</span>
+          <span><strong>New deals every week</strong></span>
+          <span class="dot">•</span>
+          <span>Shop smart with ShöpKart</span>
+          <span class="dot">•</span>
+          <span>Quality products. Reliable delivery.</span>
+        </div>
+      </div>
+
+      <div class="header">
+        <div class="left-group">
+          <div class="logo" aria-label="ShöpKart">
+            <span class="clean">Shöp</span><span class="kart">Kart</span>
+          </div>
+        </div>
+
+        <nav class="nav" aria-label="Primary">
+          <div class="nav-search" role="search">
+            <div class="search-field">
+              <span class="search-icon" aria-hidden="true">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="11" cy="11" r="7"></circle>
+                  <path d="M21 21l-4.3-4.3"></path>
+                </svg>
+              </span>
+              <label class="sr-only" for="productSearch">Search products</label>
+              <input id="productSearch" type="search" placeholder="Search products…" autocomplete="off" oninput="filterProducts(this.value)" />
+              <button class="clear-btn" type="button" aria-label="Clear search" onclick="clearSearch()">✕</button>
+            </div>
+          </div>
+        </nav>
+
+        <div class="actions" aria-label="Actions">
+          <button class="icon-btn" type="button" title="Search" onclick="focusSearch()">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="7"></circle>
+              <path d="M21 21l-4.3-4.3"></path>
+            </svg>
+          </button>
+          <button class="icon-btn" type="button" title="Account" onclick="signIn()">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 21a8 8 0 0 0-16 0"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+          </button>
+          <button class="icon-btn" type="button" title="Cart" onclick="openCart()">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M6 6h15l-1.5 9h-12z"></path>
+              <path d="M6 6l-2-3H1"></path>
+              <circle cx="9" cy="21" r="1"></circle>
+              <circle cx="18" cy="21" r="1"></circle>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <section class="hero" id="home">
+        <div class="hero-carousel" id="heroCarousel">
+          <div class="hero-slide active"><img src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=1600&q=80" alt="Slide 1"></div>
+          <div class="hero-slide"><img src="https://images.unsplash.com/photo-1510557880182-3f8a8e1d2a1f?auto=format&fit=crop&w=1600&q=80" alt="Slide 2"></div>
+          <div class="hero-slide"><img src="https://images.unsplash.com/photo-1512499617640-c2f999018b72?auto=format&fit=crop&w=1600&q=80" alt="Slide 3"></div>
+          <div class="hero-slide"><img src="https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=1600&q=80" alt="Slide 4"></div>
+          <div class="hero-slide"><img src="https://images.unsplash.com/photo-1518779578993-ec3579fee39f?auto=format&fit=crop&w=1600&q=80" alt="Slide 5"></div>
+
+          <div class="hero-arrow left" onclick="prevHero()">❮</div>
+          <div class="hero-arrow right" onclick="nextHero()">❯</div>
+          <div class="hero-dots" id="heroDots"></div>
+        </div>
+      </section>
+
+      <section class="content" id="shop">
+        <div class="products-wrap">
+          <h2>Featured Products</h2>
+          <p class="muted" id="resultsMeta">Old-school simple layout. Modern checkout when you’re ready.</p>
+          <div class="grid" id="products"></div>
+        </div>
+      </section>
+
+      <section class="content ceo-section" id="ceo-letter">
+        <div class="ceo-wrap">
+          <h2>A Letter from Our CEO</h2>
+          <p class="muted">Our promise to you</p>
+
+          <div class="ceo-letter-grid">
+            <div>
+              <p>
+                At <strong>ShöpKart</strong>, we believe ecommerce should be simple, honest, and reliable.
+                From the moment you place an order to the second it arrives at your doorstep, our team is
+                committed to quality products, fair pricing, and dependable delivery.
+              </p>
+            </div>
+            <div>
+              <p>
+                We work closely with trusted suppliers, invest in logistics, and listen obsessively to customer
+                feedback—because long-term trust matters more than short-term wins.
+              </p>
+              <p><strong>— CEO, ShöpKart</strong></p>
+            </div>
+          </div>
+
+          <div class="values">
+            <div class="value">
+              <h4>Quality First</h4>
+              <p class="muted">Every product is vetted to meet our quality standards.</p>
+            </div>
+            <div class="value">
+              <h4>Reliable Delivery</h4>
+              <p class="muted">Fast, predictable delivery—especially within Nairobi.</p>
+            </div>
+            <div class="value">
+              <h4>Customer Respect</h4>
+              <p class="muted">Clear communication, fair policies, and real support.</p>
+            </div>
+          </div>
+
+          <h3 style="margin-top:32px">Frequently Asked Questions</h3>
+          <div class="faq" id="faq">
+            <div class="faq-item">
+              <button class="faq-q" type="button">How long does delivery take?</button>
+              <div class="faq-a">Most Nairobi orders arrive same-day or next-day.</div>
+            </div>
+            <div class="faq-item">
+              <button class="faq-q" type="button">What if I receive a faulty product?</button>
+              <div class="faq-a">We offer easy returns and fast replacements—no hassle.</div>
+            </div>
+            <div class="faq-item">
+              <button class="faq-q" type="button">How do I contact support?</button>
+              <div class="faq-a">Use WhatsApp below or email us. A human will respond.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="content subscribe-section" id="subscribe">
+        <div class="subscribe-wrap">
+          <h2>Stay in the Loop</h2>
+          <p class="muted">Get updates on new arrivals, exclusive deals, and delivery announcements.</p>
+          <form class="subscribe-form" onsubmit="subscribeEmail(event)">
+            <input type="email" id="emailInput" placeholder="Enter your email address" required />
+            <button type="submit">Subscribe</button>
+          </form>
+          <small class="muted">No spam. Unsubscribe anytime.</small>
+        </div>
+      </section>
+
+      <section class="content contact-section" id="contact">
+        <div class="contact-grid">
+          <div class="contact-col">
+            <h2>Need Help?</h2>
+            <p class="muted">Our support team is available for enquiries, orders, and assistance.</p>
+            <p class="muted">We aim to respond quickly during business hours and ensure every issue is resolved properly.</p>
+          </div>
+          <div class="contact-col">
+            <h2>Chat with Us</h2>
+            <a href="whatsapp://send?phone=254700000000" target="_blank" rel="noopener" class="whatsapp-btn">💬 Contact us on WhatsApp</a>
+            <p class="muted" style="margin-top:10px">Available during business hours.</p>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    // Data
+    const products = [
+      { id: 1, name: 'Minimal Sneakers', price: 59, img: 'https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?auto=format&fit=crop&w=900&q=80' },
+      { id: 2, name: 'Classic Hoodie', price: 42, img: 'https://images.unsplash.com/photo-1520975916090-3105956dac38?auto=format&fit=crop&w=900&q=80' },
+      { id: 3, name: 'Leather Backpack', price: 88, img: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=900&q=80' },
+      { id: 4, name: 'Analog Watch', price: 120, img: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=900&q=80' },
+      { id: 5, name: 'Canvas Tote Bag', price: 34, img: 'https://images.unsplash.com/photo-1593032465171-8c0c7b94b2c7?auto=format&fit=crop&w=900&q=80' },
+      { id: 6, name: 'Sport Sunglasses', price: 29, img: 'https://images.unsplash.com/photo-1511499767150-a48a237f0083?auto=format&fit=crop&w=900&q=80' },
+      { id: 7, name: 'Wireless Earbuds', price: 75, img: 'https://images.unsplash.com/photo-1585386959984-a41552231693?auto=format&fit=crop&w=900&q=80' },
+      { id: 8, name: 'Everyday Water Bottle', price: 22, img: 'https://images.unsplash.com/photo-1602143407151-7111542de6e8?auto=format&fit=crop&w=900&q=80' }
+    ];
+
+    // Elements
+    const productsEl = document.getElementById('products');
+    const searchEl = document.getElementById('productSearch');
+
+    // Render
+    function renderProducts(list){
+      productsEl.innerHTML = '';
+
+      if (!list || list.length === 0){
+        const empty = document.createElement('div');
+        empty.className = 'strip-banner';
+        empty.style.justifyContent = 'center';
+        empty.innerHTML = '<div>No products found. Try a different search.</div>';
+        productsEl.appendChild(empty);
+        return;
+      }
+
+      list.forEach((p, idx) => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        // NOTE: Escaping the $ keeps the literal dollar sign.
+        card.innerHTML = `
+          <img src="${p.img}" alt="${p.name}" />
+          <div class="pad">
+            <h3>${p.name}</h3>
+            <div class="price">\$${p.price}</div>
+            <button class="add" type="button" onclick="addToCart(${p.id})">Add to cart</button>
+          </div>
+        `;
+        productsEl.appendChild(card);
+
+        // Insert strip after 4 products (once) in the CURRENT list
+        if (idx === 3){
+          const strip = document.createElement('div');
+          strip.className = 'strip-banner';
+          strip.innerHTML = '<div>Mid-season deals are live 🔥</div><small>Up to 30% off selected items</small>';
+          productsEl.appendChild(strip);
+        }
+      });
+    }
+
+    // Search filter
+    function filterProducts(query){
+      const q = (query || '').trim().toLowerCase();
+
+      const clearBtn = document.querySelector('.clear-btn');
+      if (clearBtn) clearBtn.style.display = q ? 'grid' : 'none';
+
+      if (!q) {
+        renderProducts(products);
+        updateResultsMeta(products.length, '');
+        return;
+      }
+
+      const filtered = products.filter(p => p.name.toLowerCase().includes(q));
+      renderProducts(filtered);
+      updateResultsMeta(filtered.length, q);
+    }
+
+    function clearSearch(){
+      if (!searchEl) return;
+      searchEl.value = '';
+      filterProducts('');
+      searchEl.focus();
+    }
+
+    function updateResultsMeta(count, q){
+      const meta = document.getElementById('resultsMeta');
+      if (!meta) return;
+      if (!q) {
+        meta.textContent = 'Old-school simple layout. Modern checkout when you’re ready.';
+        return;
+      }
+      meta.textContent = count === 0
+        ? `No results for “${q}”. Try another search.`
+        : `Showing ${count} result${count === 1 ? '' : 's'} for “${q}”.`;
+    }
+
+    // Icon actions
+    function focusSearch(){ if (searchEl) searchEl.focus(); }
+    function signIn(){ alert('Sign in flow goes here.'); }
+    function openCart(){ alert('Cart drawer goes here.'); }
+    function addToCart(id){
+      const item = products.find(p => p.id === id);
+      alert('Added to cart: ' + (item ? item.name : 'Unknown item'));
+    }
+
+    // Subscription
+    function subscribeEmail(e){
+      e.preventDefault();
+      const emailEl = document.getElementById('emailInput');
+      const email = (emailEl ? emailEl.value : '').trim();
+      if (!email) return;
+      alert('Subscribed: ' + email);
+      e.target.reset();
+    }
+
+    // FAQ accordion
+    document.querySelectorAll('.faq-q').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const item = btn.closest('.faq-item');
+        if (item) item.classList.toggle('open');
+      });
+    });
+
+    // Initial render
+    renderProducts(products);
+    updateResultsMeta(products.length, '');
+
+    // Hero carousel
+    const heroSlides = Array.from(document.querySelectorAll('.hero-slide'));
+    const heroDotsEl = document.getElementById('heroDots');
+    let heroIndex = 0;
+    let heroTimer = null;
+
+    function updateHero(){
+      heroSlides.forEach((s, idx) => s.classList.toggle('active', idx === heroIndex));
+      const dots = document.querySelectorAll('.hero-dot');
+      dots.forEach((d, idx) => d.classList.toggle('active', idx === heroIndex));
+    }
+
+    function nextHero(){
+      heroIndex = (heroIndex + 1) % heroSlides.length;
+      updateHero();
+    }
+
+    function prevHero(){
+      heroIndex = (heroIndex - 1 + heroSlides.length) % heroSlides.length;
+      updateHero();
+    }
+
+    function startHeroAutoplay(){
+      stopHeroAutoplay();
+      heroTimer = setInterval(nextHero, 5000);
+    }
+
+    function stopHeroAutoplay(){
+      if (heroTimer) clearInterval(heroTimer);
+      heroTimer = null;
+    }
+
+    // Build dots
+    if (heroDotsEl){
+      heroSlides.forEach((_, i) => {
+        const dot = document.createElement('div');
+        dot.className = 'hero-dot' + (i === 0 ? ' active' : '');
+        dot.addEventListener('click', () => {
+          heroIndex = i;
+          updateHero();
+          startHeroAutoplay();
+        });
+        heroDotsEl.appendChild(dot);
+      });
+    }
+
+    startHeroAutoplay();
+
+    // --- Tiny test cases (console asserts) ---
+    (function runTests(){
+      console.assert(typeof renderProducts === 'function', 'renderProducts should be defined');
+      console.assert(typeof filterProducts === 'function', 'filterProducts should be defined');
+      console.assert(document.getElementById('productSearch') !== null, 'Search input should exist');
+
+      // filter logic
+      const hood = filterList('hood');
+      console.assert(hood.length === 1 && hood[0].name.includes('Hoodie'), 'Filtering "hood" should return Classic Hoodie');
+      const emptyQ = filterList('');
+      console.assert(emptyQ.length === products.length, 'Empty query should return all products');
+      const none = filterList('zzzzzz');
+      console.assert(none.length === 0, 'Nonsense query should return 0 products');
+
+      // render empty state
+      renderProducts([]);
+      console.assert(document.querySelectorAll('#products .strip-banner').length === 1, 'Empty render should show one banner');
+      renderProducts(products);
+
+      function filterList(q){
+        const qq = (q || '').trim().toLowerCase();
+        return qq ? products.filter(p => p.name.toLowerCase().includes(qq)) : products.slice();
+      }
+    })();
+  </script>
+</body>
+</html>
