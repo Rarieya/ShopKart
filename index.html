@@ -87,9 +87,11 @@
       user-select:none;
     }
     .account-label{
-      font-weight:900;
+      font-weight:400;
       font-size:13px;
       letter-spacing:.5px;
+      text-transform: capitalize;
+      color: var(--brand);
     }
 
     .logo .clean{color: var(--brand)}
@@ -727,19 +729,19 @@ function updateAccountUI(user){
       if (!label) return;
 
       if (user){
-        const name =
-          user.displayName?.split(' ')[0]?.toUpperCase() ||
-          user.email?.split('@')[0]?.toUpperCase();
+        const rawName =
+          user.displayName ||
+          user.email?.split('@')[0] ||
+          'USR';
 
-        label.textContent = `#${name}`;
-      } else {
-        label.innerHTML = `
-          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M20 21a8 8 0 0 0-16 0"></path>
-            <circle cx="12" cy="7" r="4"></circle>
-          </svg>
-        `;
+        const shortName = rawName
+          .replace(/\s+/g, '')
+          .slice(0, 3)
+          .toUpperCase();
+
+        label.textContent = shortName;
       }
+
     }
 
 // Initialize Firebase once
