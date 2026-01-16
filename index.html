@@ -86,6 +86,12 @@
       line-height: 1;
       user-select:none;
     }
+    .account-label{
+      font-weight:900;
+      font-size:13px;
+      letter-spacing:.5px;
+    }
+
     .logo .clean{color: var(--brand)}
     .logo .kart{color: var(--brand2)}
 
@@ -418,11 +424,19 @@
 
         <!-- Account + Cart -->
         <div class="actions" aria-label="Actions">
-          <button class="icon-btn" type="button" title="Account" onclick="signIn()">
+          <!--button class="icon-btn" type="button" title="Account" onclick="signIn()">
             <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M20 21a8 8 0 0 0-16 0"></path>
               <circle cx="12" cy="7" r="4"></circle>
             </svg>
+          </button-->
+          <button class="icon-btn account-btn" type="button" onclick="signIn()" id="accountBtn">
+            <span class="account-label" id="accountLabel" aria-hidden="true">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21a8 8 0 0 0-16 0"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+            </span>
           </button>
           <button class="icon-btn" type="button" title="Cart" onclick="openCart()">
             <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -662,13 +676,32 @@
 
     // Icon actions
     function focusSearch(){ if (searchEl) searchEl.focus(); }
-    function signIn(){
+    /*function signIn(){
     const bd = document.getElementById('authBackdrop');
     if (bd) { bd.classList.add('open'); bd.setAttribute('aria-hidden','false'); }
 
     const btn = document.querySelector('#authForm button[type="submit"]');
     if (btn) btn.focus();
-  }
+    }*/
+    function signIn(){
+      // If already logged in, don't show the Google sign-in modal again
+      if (currentUser){
+        alert(`Signed in as ${currentUser.displayName || currentUser.email}`);
+        return;
+      }
+
+      // Otherwise open the sign-in modal
+      const bd = document.getElementById('authBackdrop');
+      if (bd) {
+        bd.classList.add('open');
+        bd.setAttribute('aria-hidden','false');
+      }
+
+      const btn = document.querySelector('#authForm button[type="submit"]');
+      if (btn) btn.focus();
+    }
+
+
 
     function closeAuth(){
       const bd = document.getElementById('authBackdrop');
@@ -689,11 +722,41 @@ const firebaseConfig = {
   measurementId: "G-WD8CYB0W1K"
 };
 
+function updateAccountUI(user){
+      const label = document.getElementById('accountLabel');
+      if (!label) return;
+
+      if (user){
+        const name =
+          user.displayName?.split(' ')[0]?.toUpperCase() ||
+          user.email?.split('@')[0]?.toUpperCase();
+
+        label.textContent = `#${name}`;
+      } else {
+        label.innerHTML = `
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 21a8 8 0 0 0-16 0"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+        `;
+      }
+    }
+
 // Initialize Firebase once
 if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 
+
+
 const auth = firebase.auth();
 const provider = new firebase.auth.GoogleAuthProvider();
+
+let currentUser = null;
+
+auth.onAuthStateChanged((user) => {
+  currentUser = user;
+  updateAccountUI(user);
+});
+
 
 function googleSignIn(){
   auth.signInWithPopup(provider)
@@ -706,6 +769,8 @@ function googleSignIn(){
         email: user.email,
         photo: user.photoURL
       }));
+
+      updateAccountUI(user);
 
       closeAuth();
       alert(`Welcome ${user.displayName || user.email}`);
@@ -732,6 +797,8 @@ function googleSignIn(){
       closeAuth();
       alert('Signed in as ' + email);
     }*/
+    
+
     function openCart(){ alert('Cart drawer goes here.'); }
     function addToCart(id){
       const item = products.find(p => p.id === id);
